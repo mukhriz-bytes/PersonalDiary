@@ -17,6 +17,7 @@ app.use(cors());
 app.use(express.json());
  
 app.use('/api/diaries', require('./routes/diaryRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
  
 const PORT = process.env.PORT;
  

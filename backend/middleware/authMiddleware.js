@@ -25,10 +25,11 @@ const protect = async (req, res, next) => {
                 .select('-password');
  
             next();
+            return;
  
         } catch (error) {
  
-            res.status(401).json({
+            return res.status(401).json({
                 message: 'Not authorized'
             });
         }
@@ -37,7 +38,7 @@ const protect = async (req, res, next) => {
  
     if (!token) {
  
-        res.status(401).json({
+        return res.status(401).json({
             message: 'No token provided'
         });
     }

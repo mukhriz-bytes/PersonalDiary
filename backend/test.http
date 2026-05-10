@@ -1,0 +1,78 @@
+# REST Client variables: no external environment needed
+# Send Register or Login first, then copy the token into @token below.
+# Some clients do not support automatic token extraction from response.
+@baseUrl = http://localhost:5000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZmVlNGQ0N2Y4ZTZmYjlhNDFhZTA0ZCIsImlhdCI6MTc3ODMxMjk2NCwiZXhwIjoxNzgwOTA0OTY0fQ.16BuEcrBfTTI0zwV7PaH3SKxsH6yJJ6Wz_7sDSeB8n0
+
+### Test Server Connection
+GET http://localhost:5000/
+
+###
+
+### Register User
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Azri",
+    "email": "azri@example.com",
+    "password": "pass123"
+}
+
+###
+
+### Login User
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "azri@example.com",
+    "password": "pass123"
+}
+
+
+###
+
+### Create Diary Entry (Protected)
+POST {{baseUrl}}/api/diaries
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "Testing API with HTTP Client: Part 1",
+    "content": "Testing the API endpoints using the REST Client extension is very confusing.",
+    "mood": "Frustrated"
+}
+
+###
+
+### Get All Diary Entries (Protected)
+GET {{baseUrl}}/api/diaries
+Authorization: Bearer {{token}}
+
+###
+
+### Get Diary Entry by ID (Protected)
+GET {{baseUrl}}/api/diaries/YOUR_DIARY_ID_HERE
+Authorization: Bearer {{token}}
+
+###
+
+### Update Diary Entry (Protected)
+PUT {{baseUrl}}/api/diaries/YOUR_DIARY_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "Introduction to Feathers.js and MongoDB.",
+    "content": "I am learning a middleware framework and database integration.",
+    "mood": "Curious"
+}
+
+###
+
+### Delete Diary Entry (Protected)
+DELETE {{baseUrl}}/api/diaries/YOUR_DIARY_ID_HERE
+Authorization: Bearer {{token}}
+
+###

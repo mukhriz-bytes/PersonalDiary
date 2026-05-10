@@ -97,7 +97,31 @@ const loginUser = async (req, res) => {
 };
  
  
+// VERIFY TOKEN
+const verifyToken = async (req, res) => {
+ 
+    try {
+ 
+        res.json({
+            valid: true,
+            user: {
+                _id: req.user._id,
+                name: req.user.name,
+                email: req.user.email
+            }
+        });
+ 
+    } catch (error) {
+ 
+        res.status(401).json({
+            message: 'Token verification failed'
+        });
+    }
+};
+ 
+ 
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    verifyToken
 };

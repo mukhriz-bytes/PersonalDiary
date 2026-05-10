@@ -1,16 +1,19 @@
 const Diary = require('../model/Diary');
- 
- 
-// CREATE
 
+// CREATE
 const createDiary = async (req, res) => {
 
     try {
- 
-        const diary = await Diary.create(req.body);
- 
+
+        const diary = await Diary.create({
+            user: req.user._id,
+            title: req.body.title,
+            content: req.body.content,
+            mood: req.body.mood
+        });
+
         res.status(201).json(diary);
- 
+
     } catch (error) {
 
         res.status(500).json({
@@ -22,18 +25,16 @@ const createDiary = async (req, res) => {
     }
 
 };
- 
- 
-// READ ALL
 
+// READ ALL
 const getDiaries = async (req, res) => {
 
     try {
- 
-        const diaries = await Diary.find();
- 
+
+        const diaries = await Diary.find({ user: req.user._id });
+
         res.json(diaries);
- 
+
     } catch (error) {
 
         res.status(500).json({
@@ -45,16 +46,15 @@ const getDiaries = async (req, res) => {
     }
 
 };
- 
- 
+
 // READ SINGLE
 
 const getDiaryById = async (req, res) => {
 
     try {
- 
+
         const diary = await Diary.findById(req.params.id);
- 
+
         if (!diary) {
 
             return res.status(404).json({
@@ -64,9 +64,21 @@ const getDiaryById = async (req, res) => {
             });
 
         }
- 
+
+        // Check if diary belongs to user
+
+        if (diary.user.toString() !== req.user._id.toString()) {
+
+            return res.status(401).json({
+
+                message: 'Not authorized'
+
+            });
+
+        }
+
         res.json(diary);
- 
+
     } catch (error) {
 
         res.status(500).json({
@@ -78,24 +90,16 @@ const getDiaryById = async (req, res) => {
     }
 
 };
- 
- 
+
+
 // UPDATE
 
 const updateDiary = async (req, res) => {
 
     try {
- 
-        const diary = await Diary.findByIdAndUpdate(
 
-            req.params.id,
+        let diary = await Diary.findById(req.params.id);
 
-            req.body,
-
-            { new: true }
-
-        );
- 
         if (!diary) {
 
             return res.status(404).json({
@@ -105,9 +109,47 @@ const updateDiary = async (req, res) => {
             });
 
         }
- 
+
+        // Check if diary belongs to user
+
+        if (diary.user.toString() !== req.user._id.toString()) {
+
+            return res.status(401).json({
+
+                message: 'Not authorized'
+
+            });
+
+        }
+
+        // Only allow updates to title, content, mood
+
+        const allowedFields = ['title', 'content', 'mood'];
+
+        const updateData = {};
+
+        allowedFields.forEach(field => {
+
+            if (req.body[field] !== undefined) {
+
+                updateData[field] = req.body[field];
+
+            }
+
+        });
+
+        diary = await Diary.findByIdAndUpdate(
+
+            req.params.id,
+
+            updateData,
+
+            { new: true }
+
+        );
+
         res.json(diary);
- 
+
     } catch (error) {
 
         res.status(500).json({
@@ -119,16 +161,16 @@ const updateDiary = async (req, res) => {
     }
 
 };
- 
- 
+
+
 // DELETE
 
 const deleteDiary = async (req, res) => {
 
     try {
- 
-        const diary = await Diary.findByIdAndDelete(req.params.id);
- 
+
+        const diary = await Diary.findById(req.params.id);
+
         if (!diary) {
 
             return res.status(404).json({
@@ -138,13 +180,27 @@ const deleteDiary = async (req, res) => {
             });
 
         }
- 
+
+        // Check if diary belongs to user
+
+        if (diary.user.toString() !== req.user._id.toString()) {
+
+            return res.status(401).json({
+
+                message: 'Not authorized'
+
+            });
+
+        }
+
+        await Diary.findByIdAndDelete(req.params.id);
+
         res.json({
 
             message: 'Diary deleted successfully'
 
         });
- 
+
     } catch (error) {
 
         res.status(500).json({
@@ -156,20 +212,5 @@ const deleteDiary = async (req, res) => {
     }
 
 };
- 
+
 module.exports = { createDiary, getDiaries, getDiaryById, updateDiary, deleteDiary };
- 
- 
-module.exports = {
-
-    createDiary,
-
-    getDiaries,
-
-    getDiaryById,
-
-    updateDiary,
-
-    deleteDiary
-
-};

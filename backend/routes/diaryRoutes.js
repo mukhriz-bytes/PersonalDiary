@@ -2,7 +2,7 @@ const express = require('express');
  
 const router = express.Router();
  
-const {createDiary, getDiaries, getDiaryById, updateDiary, deleteDiary} = require('../controllers/diaryController');
+const {createDiary, getDiaries, getDiaryById, updateDiary, deleteDiary} = require('../controllers/diaryControllers');
  
 const { protect } = require('../middleware/authMiddleware');
  
